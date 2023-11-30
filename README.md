@@ -14,9 +14,9 @@ This project is a summary of this back-end trimester: authentication, NodeJS, Mo
 Team Members:
 
 1) Masereka Benon
-[Email] (benonkighoma@gmail.com)
-[Github] (https://github.com/Benonking)
+[Email](benonkighoma@gmail.com)
+[Github](https://github.com/Benonking)
 
 2) George Esetevbe
-[email] (georgeperfect4u@gmail.com)
-[Github] (https://github.com/georgeeset)
+[email](georgeperfect4u@gmail.com)
+[Github](https://github.com/georgeeset)
