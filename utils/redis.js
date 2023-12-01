@@ -5,14 +5,14 @@ class RedisClient {
   constructor() {
     this.client = redis.createClient();
     this.client.on('connect', () => {
-     // console.log('connected to redis');
+      // console.log('connected to redis');
     });
     this.client.on('error', (err) => {
       console.error(err);
     });
   }
 
-	isAlive() {
+  isAlive() {
     try {
       return this.client.connected;
     } catch (error) {
@@ -23,12 +23,8 @@ class RedisClient {
 
   async get(key) {
     const getAsync = promisify(this.client.get).bind(this.client);
-    try {
-      const value = await getAsync(key);
-      return value;
-    } catch (error) {
-      console.error(error);
-    }
+    const value = await getAsync(key);
+    return value;
   }
 
   async set(key, value, expDuration) {
@@ -38,7 +34,7 @@ class RedisClient {
     try {
       await setAsync(key, value);
       await expireAsync(key, expDuration);
-      //console.log(`${key}: ${value} set`);
+      // console.log(`${key}: ${value} set`);
     } catch (error) {
       console.error(error);
     }
