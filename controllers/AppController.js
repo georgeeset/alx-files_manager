@@ -12,3 +12,4 @@ const getStats = async (req, res) => {
 	return res.status(200). json({users: userNumber, files: fileNumber});
 };
 module.exports = { getStatus, getStats };
+

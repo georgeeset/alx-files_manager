@@ -1,7 +1,14 @@
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
+// const { MongoClient } = require('mongodb');
+
+const DB_HOST = process.env.DB_HOST || 'localhost';
+const DB_PORT = process.env.DB_PORT || 27017;
+const DB_DATABASE = process.env.DB_DATABASE || 'files_manager';
+const url = `mongodb://${DB_HOST}:${DB_PORT}`;
 
 class DBClient {
   constructor() {
+
     this.host = process.env.BD_HOST || 'localhost';
     this.port = process.env.PORT || 27017;
     this.database = process.env.DB_DATABASE || 'files_manager';
@@ -13,29 +20,18 @@ class DBClient {
       }).catch((error) => {
         console.log(error);
       });
+
   }
 
-  isAlive() {
-    return this.client.isConnected();
-  }
+  isAlive() { return !!this.db; }
 
-  async nbUsers() {
-		if (this.isAlive()){
-    	const userColletion = this.client.db().collection('users');
-    	const userNumber = await userColletion.countDocuments();
-    	return userNumber;
-		}
-  }
+  async nbUsers() { return this.users.countDocuments(); }
 
-  async nbFiles() {
-    
-		if (this.isAlive()){
-			// access the collectiom
+  async nbFiles() { return this.files.countDocuments(); }
 
-    	const filesColletion = this.client.db().collection('files');
-    	const fileNumber = await filesColletion.countDocuments();
-    	return fileNumber;
-		}
+  async getUser(query) {
+    const user = await this.db.collection('users').findOne(query);
+    return user;
   }
 	async findUserByEmail(email) {
 		if (this.isAlive){
@@ -61,5 +57,6 @@ class DBClient {
 		return user;
 	}
 }
-const dbclient = new DBClient();
-export default dbclient;
+
+const dbClient = new DBClient();
+module.exports = dbClient;

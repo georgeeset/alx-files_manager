@@ -28,3 +28,4 @@ const waitConnection = () => {
     console.log(await dbClient.nbUsers());
     console.log(await dbClient.nbFiles());
 })();
+
