@@ -9,7 +9,7 @@ class DBClient {
 
     this.client.connect()
       .then(() => {
-        console.log('Mongo bd connected');
+        // console.log('Mongo bd connected');
       }).catch((error) => {
         console.log(error);
       });
@@ -37,6 +37,29 @@ class DBClient {
     	return fileNumber;
 		}
   }
+	async findUserByEmail(email) {
+		if (this.isAlive){
+			const userCollection = this.client.db().collection('users');
+			const user = await userCollection.findOne({email});
+			return user;
+		}
+
+	}
+	async insertUser(user){
+		const userCollection = this.client.db().collection('users');
+		const newuser = await userCollection.insertOne(user)
+		return newuser;
+	}
+	async getUserByEmailandPassword(email, hashedPassword) {
+		const userCollection = this.client.db().collection('users');
+		const user = await userCollection.findOne({email, password:hashedPassword});
+		return user;
+	}
+	async getUserById(userId) {
+		const userCollection = this.client.db().collection('users');
+		const user = await userCollection.findOne({_id: userId});
+		return user;
+	}
 }
 const dbclient = new DBClient();
 export default dbclient;
