@@ -8,16 +8,19 @@ const url = `mongodb://${DB_HOST}:${DB_PORT}`;
 
 class DBClient {
   constructor() {
-    MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
-      if (!err) {
-        this.db = client.db(DB_DATABASE);
-        this.users = this.db.collection('users');
-        this.files = this.db.collection('files');
-      } else {
-        console.log(err.message);
-        this.db = false;
-      }
-    });
+
+    this.host = process.env.BD_HOST || 'localhost';
+    this.port = process.env.PORT || 27017;
+    this.database = process.env.DB_DATABASE || 'files_manager';
+    this.client = new MongoClient(`mongodb://${this.host}:${this.port}/${this.database}`, { useUnifiedTopology: true });
+
+    this.client.connect()
+      .then(() => {
+        // console.log('Mongo bd connected');
+      }).catch((error) => {
+        console.log(error);
+      });
+
   }
 
   isAlive() { return !!this.db; }
@@ -30,6 +33,29 @@ class DBClient {
     const user = await this.db.collection('users').findOne(query);
     return user;
   }
+	async findUserByEmail(email) {
+		if (this.isAlive){
+			const userCollection = this.client.db().collection('users');
+			const user = await userCollection.findOne({email});
+			return user;
+		}
+
+	}
+	async insertUser(user){
+		const userCollection = this.client.db().collection('users');
+		const newuser = await userCollection.insertOne(user)
+		return newuser;
+	}
+	async getUserByEmailandPassword(email, hashedPassword) {
+		const userCollection = this.client.db().collection('users');
+		const user = await userCollection.findOne({email, password:hashedPassword});
+		return user;
+	}
+	async getUserById(userId) {
+		const userCollection = this.client.db().collection('users');
+		const user = await userCollection.findOne({_id: userId});
+		return user;
+	}
 }
 
 const dbClient = new DBClient();
