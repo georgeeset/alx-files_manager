@@ -44,11 +44,13 @@ class DBClient {
       throw error;
     }
   }
-  async findUserByEmail(email){
+
+  async findUserByEmail(email) {
     const userCollection = this.client.db().collection('users');
-    const result = await userCollection.findOne({email});
-    return result
+    const result = await userCollection.findOne({ email });
+    return result;
   }
+
   async insertUser(userObj) {
     const userCollection = this.client.db().collection('users');
     const result = await userCollection.insertOne(userObj);
@@ -65,6 +67,11 @@ class DBClient {
     const userCollection = this.client.db().collection('users');
     const user = await userCollection.findOne({ _id: userId });
     return user;
+  }
+  async insertFile(fileobj){
+    const filesCollection = this.client.db.collection('users');
+    const result = filesCollection.insertOne(fileobj);
+    return result;
   }
 }
 const dbclient = new DBClient();

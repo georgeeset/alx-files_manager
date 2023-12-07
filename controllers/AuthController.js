@@ -1,11 +1,11 @@
 import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
-import UserController from '../controllers/UsersController';
+import UserController from './UsersController';
 
 const uuidv4 = require('uuid').v4;
 
-class AuthController{
-  static async getConnect(req, res){
+class AuthController {
+  static async getConnect(req, res) {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Basic ')) {
       return res.status(401).send({ error: 'Unauthorized' });
@@ -26,9 +26,9 @@ class AuthController{
       return res.status(200).send({ token });
     }
     return res.status(401).send({ error: 'Unauthorized' });
-  };
+  }
 
-  static async getDisconnect(req, res){
+  static async getDisconnect(req, res) {
     const tokenHeader = req.headers['x-token'];
     // Get the user id from redis store using token as key
     const userId = await redisClient.get(`auth_${tokenHeader}`);
@@ -37,7 +37,7 @@ class AuthController{
     // Delete the user id from redis store
     await redisClient.del(`auth_${tokenHeader}`);
     return res.status(204).send();
-  };
+  }
 }
-//const authController = new AuthController()
-module.exports = AuthController
+// const authController = new AuthController()
+module.exports = AuthController;
