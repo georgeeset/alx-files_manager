@@ -1,9 +1,9 @@
-// import redisClient from "../utils/redis"; // Assuming you'll need this in the future
+import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
 
 const crypto = require('crypto');
 
-class UsersController {
+class UserController {
   static hashPassword(password) {
     const sha1Hash = crypto.createHash('sha1');
     sha1Hash.update(password, 'utf-8');
@@ -31,7 +31,7 @@ class UsersController {
         return res.status(400).json({ error: 'Already exist' });
       }
 
-      const hashedPassword = UsersController.hashPassword(password);
+      const hashedPassword = UserController.hashPassword(password);
 
       // create new User
       const newUser = {
@@ -58,6 +58,31 @@ class UsersController {
       return res.status(500).send({ error: 'Internal Server Error' });
     }
   }
+
+  static async getMe(req, res) {
+    try {
+      const token = req.headers['x-token'];
+      console.log('Token:', token);
+
+      const key = `auth_${token}`;
+      const userId = await redisClient.get(key);
+      console.log('User ID from Redis:', userId);
+
+      const user = await dbClient.getUserById(userId);
+      console.log('User from MongoDB:', user);
+
+      if (!user) {
+        return res.status(401).send({ error: 'Unauthorized' });
+      }
+
+      // Return user object (email and _id only)
+      const { _id, email } = user;
+      return res.status(200).send({ id: _id.toString(), email });
+    } catch (error) {
+      console.error('Error in getMe:', error);
+      return res.status(500).send({ error: 'Internal Server Error' });
+    }
+  }
 }
 
-module.exports = UsersController;
+module.exports = UserController;
