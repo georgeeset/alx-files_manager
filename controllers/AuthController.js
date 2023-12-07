@@ -2,7 +2,7 @@ import redisClient from '../utils/redis';
 import dbclient from '../utils/db';
 
 const uuidv4 = require('uuid').v4;
-const { hashedPassword } = require('./UserController');
+const { hashedPassword } = require('./UsersController');
 
 const getConnect = async (req, res) => {
   const authHeader = req.headers.authorization;
