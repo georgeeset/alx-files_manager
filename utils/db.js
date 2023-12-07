@@ -44,6 +44,16 @@ class DBClient {
       throw error;
     }
   }
+  async findUserByEmail(email){
+    const userCollection = this.client.db().collection('users');
+    const result = await userCollection.findOne({email});
+    return result
+  }
+  async insertUser(userObj) {
+    const userCollection = this.client.db().collection('users');
+    const result = await userCollection.insertOne(userObj);
+    return result;
+  }
 
   async getUserByEmailandPassword(email, hashedPassword) {
     const userCollection = this.client.db().collection('users');
