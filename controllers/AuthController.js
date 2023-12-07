@@ -1,19 +1,21 @@
 import redisClient from '../utils/redis';
-import dbclient from '../utils/db';
+import dbClient from '../utils/db';
+import UsersController from './UsersController';
 
 const uuidv4 = require('uuid').v4;
-const { hashedPassword } = require('./UsersController');
 
 const getConnect = async (req, res) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Basic ')) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).send({ error: 'Unauthorized' });
   }
   // get user credentials Basic Auth
-  const credentials = Buffer.from(authHeader.split('')[1], 'base64').toString('utf-8').split(':');
-  const [email, passowrd] = credentials;
+  const credentials = Buffer.from(authHeader.split(' ')[1], 'base64').toString('utf-8').split(':');
+  const [email, password] = credentials;
   // find user
-  const user = await dbclient.getUserByEmailandPassword(email, hashedPassword(passowrd));
+  const user = await dbClient.getUserByEmailandPassword(
+    email, UsersController.hashPassword(password),
+  );
 
   if (user) {
     const token = uuidv4();
@@ -45,19 +47,22 @@ const getDisconnect = async (req, res) => {
 
     return res.status(204).end();
   } catch (error) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).send({ error: 'Unauthorized' });
   }
 };
 const getMe = async (req, res) => {
-  const token = await req.headers['X-token'];
+  const token = await req.headers['x-token'];
   if (token) {
     const key = `auth_${token}`;
     const userId = await redisClient.get(key);
-    const user = await dbclient.getUserById(userId);
-    // Return user object (email and id only)
+    const user = await dbClient.getUserById(userId);
+    if (!user || user._id === null) {
+      return res.status(401).send({ error: 'Unauthorized' });
+    }
+    // Return user object (email and _id only)
     const { _id, email } = user;
-    return res.status(200).json({ id: _id.toString(), email });
+    return res.status(200).send({ id: _id.toString(), email });
   }
-  return res.status(401).json({ error: 'Unauthorized' });
+  return res.status(401).send({ error: 'Unauthorized' });
 };
 module.exports = { getConnect, getDisconnect, getMe };

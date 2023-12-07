@@ -63,7 +63,7 @@ class DBClient {
 
   async getUserById(userId) {
     const userCollection = this.client.db().collection('users');
-    const user = await userCollection.findOne({ _id: userId });
+    const user = await userCollection.findOne({userId });
     return user;
   }
 }
